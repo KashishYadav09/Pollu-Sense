@@ -2,8 +2,8 @@ import React from 'react';
 import { useAqiStore } from '../../store/AqiGlobalStore';
 import type { DateRangeFilter } from '../../types/aqi';
 import { getAqiBracket } from '../utils/aqiUtils';
+import logo from '../../assets/logo.png';
 import { 
-  Wind, 
   MapPin, 
   Calendar, 
   Search, 
@@ -52,9 +52,7 @@ export const FilterSidebar: React.FC = () => {
       {/* Brand Header */}
       <div className="flex items-center justify-between pb-4 border-b border-slate-100">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-black flex items-center justify-center shadow-sm">
-            <Wind className="w-5 h-5 text-white" />
-          </div>
+          <img src={logo} alt="Pollu Sense" className="h-8 w-8 object-contain" />
           <div>
             <h1 className="text-xl font-bold tracking-tight text-slate-900">
               Pollu Sense

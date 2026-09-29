@@ -6,26 +6,27 @@ import { TemporalTrendChart } from '../analytics/TemporalTrendChart';
 import { PollutantComparisonBar } from '../analytics/PollutantComparisonBar';
 import { useAqiStore } from '../../store/AqiGlobalStore';
 import { 
-  Radio, 
   Menu, 
   X, 
-  Download, 
-  CloudFog, 
-  Database 
+  Download 
 } from 'lucide-react';
+import logo from '../../assets/logo.png';
 
 export const PollutionDashboard: React.FC = () => {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const { allRecords, selectedCity } = useAqiStore();
+  const { getFilteredRecords } = useAqiStore();
 
-  const handleExportData = () => {
-    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(allRecords, null, 2));
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.setAttribute('href', dataStr);
-    downloadAnchor.setAttribute('download', `pollu_sense_${selectedCity.toLowerCase()}_data.json`);
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
+  const handleExportJSON = () => {
+    const filteredData = getFilteredRecords();
+    const blob = new Blob([JSON.stringify(filteredData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'pollu_sense_export.json';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -35,26 +36,18 @@ export const PollutionDashboard: React.FC = () => {
         <div className="flex items-center gap-3">
           <button
             onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
-            className="lg:hidden p-2 rounded-2xl bg-slate-100 border border-slate-200 text-slate-600 hover:text-slate-900"
+            className="lg:hidden p-2 rounded-2xl bg-slate-100 border border-slate-200 text-slate-600 hover:text-slate-900 transition-colors"
             aria-label="Toggle Navigation Filter Menu"
           >
             {mobileSidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
 
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-black flex items-center justify-center shadow-sm">
-              <CloudFog className="w-4 h-4 text-white" />
-            </div>
+          <div className="flex items-center gap-3">
+            <img src={logo} alt="Pollu Sense" className="h-8 w-8 object-contain" />
             <div>
-              <div className="flex items-center gap-2">
-                <span className="font-extrabold text-base tracking-tight text-slate-900">
-                  Pollu Sense
-                </span>
-                <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/80">
-                  <Radio className="w-2.5 h-2.5 animate-pulse text-emerald-600" />
-                  Live Network
-                </span>
-              </div>
+              <span className="font-extrabold text-base tracking-tight text-slate-900 block leading-tight">
+                Pollu Sense
+              </span>
               <p className="text-[11px] text-slate-400 hidden sm:block">
                 Serverless Air Quality & Environmental Telemetry
               </p>
@@ -62,18 +55,13 @@ export const PollutionDashboard: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-2.5">
-          <div className="hidden md:flex items-center gap-2 text-xs text-slate-500 bg-slate-100/80 px-3 py-1.5 rounded-2xl border border-slate-200/80">
-            <Database className="w-3.5 h-3.5 text-slate-600" />
-            <span>Dataset: <span className="text-slate-800 font-mono font-medium">aqi_data.json</span></span>
-          </div>
-
+        <div className="flex items-center gap-3">
           <button
-            onClick={handleExportData}
-            className="flex items-center gap-1.5 text-xs font-semibold px-3.5 py-2 rounded-2xl bg-black hover:bg-slate-800 text-white transition-all shadow-sm"
+            onClick={handleExportJSON}
+            className="flex items-center gap-1.5 text-xs font-semibold px-3.5 py-2 rounded-2xl bg-black hover:bg-slate-800 text-white transition-all shadow-sm active:scale-95"
           >
             <Download className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Export JSON</span>
+            <span>Export JSON</span>
           </button>
         </div>
       </header>

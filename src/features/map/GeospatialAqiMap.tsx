@@ -101,18 +101,20 @@ export const GeospatialAqiMap: React.FC = () => {
             const isSelected =
               selectedCity.toLowerCase() === cityRec.city.toLowerCase();
 
-            const radius = Math.max(14, Math.min(30, cityRec.aqi / 10));
+            // Scaled formula to prevent circle marker overlap and keep map clear
+            const pollutantValue = (cityRec as unknown as { pollutant_avg?: number }).pollutant_avg ?? cityRec.aqi;
+            const markerRadius = Math.max(4, Math.min(10, pollutantValue / 15));
 
             return (
               <CircleMarker
                 key={cityRec.id}
                 center={[cityRec.latitude, cityRec.longitude]}
-                radius={isSelected ? radius + 5 : radius}
+                radius={isSelected ? markerRadius + 3 : markerRadius}
                 pathOptions={{
                   color: isSelected ? '#000000' : bracket.color,
                   fillColor: bracket.color,
-                  fillOpacity: isSelected ? 0.9 : 0.7,
-                  weight: isSelected ? 3 : 1.5,
+                  fillOpacity: isSelected ? 0.95 : 0.75,
+                  weight: isSelected ? 2.5 : 1,
                 }}
                 eventHandlers={{
                   click: () => {
